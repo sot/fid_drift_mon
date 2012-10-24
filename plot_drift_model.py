@@ -31,7 +31,7 @@ def get_fid_stats(db, det):
              ' WHERE proc_status IS NULL AND id_string LIKE "{det}%"'
              .format(det=det))
     vals = db.fetchall(query)
-    return vals  # np.rec.fromrecords(vals, names=[x[0] for x in cur.description])
+    return vals
 
 
 def plotfids(detstats, det, tstart):
@@ -70,7 +70,7 @@ def parse_args(args):
     parser.add_argument('--n-days', type=float,
                         default=100,
                         help='Number of days from present to plot')
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     return args
 
 
