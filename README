@@ -1,4 +1,0 @@
-Running plot_drift.py
----------------------
-As of this writing only the i686-linux_RHFC-4 platform (e.g. baffin) has a working Sybase module.
-This task must therefore be run on that architecture.
