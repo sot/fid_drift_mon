@@ -45,12 +45,12 @@ def plotfids(detstats, det, data_dir):
     plt.axis([1999, maxyear, -25, 10])
     plt.grid()
     for fid in fids[det]:
-        print 'Fid %s %d' % (det, fid)
         fidstats = detstats[detstats['id_num'] == fid]
         year = fidstats['tstart'] / 86400. / 365.25 + 1998.0
         normmask = np.logical_and(year > 2002.0, year < 2003.)
         fidstatsnorm = fidstats[normmask]
         if len(fidstatsnorm) < 3:
+            print 'Fid %s %d' % (det, fid)
             print 'Not enough readouts for the median'
             continue
         y0 = np.median(fidstatsnorm['ang_y_med'])
