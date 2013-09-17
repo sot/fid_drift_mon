@@ -12,12 +12,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import Ska.DBI
 
+EXCLUDE_OBSIDS = '(2010, 2783, 1431, 1411)'
 
 def get_fid_stats(db, det):
-    query = ('select id_num, id_string, tstart, ang_y_med, ang_z_med, sim_z_offset'
+    query = ('select obsid, id_num, id_string, tstart, ang_y_med, ang_z_med, sim_z_offset'
              ' FROM fid_stats'
-             ' WHERE proc_status IS NULL AND id_string LIKE "{}%"'
-             .format(det))
+             ' WHERE proc_status IS NULL AND id_string LIKE "{}%" '
+             ' and obsid not in {} '
+             .format(det, EXCLUDE_OBSIDS))
     vals = db.fetchall(query)
     return vals
 
@@ -36,14 +38,16 @@ def plotfids(detstats, det, data_dir):
     plt.subplot(2, 1, 1)
     plt.ylabel('Y offset (arcsec)')
     maxyear = int(time.strftime('%Y')) + 1
-    plt.axis([1999, maxyear, -25, 10])
+    DEFAULT_MIN = -25 # arcsec
+    plt.axis([1999, maxyear, DEFAULT_MIN, 10])
     plt.title(det + ' Fid Drift')
     plt.grid()
     plt.subplot(2, 1, 2)
     plt.xlabel('Year')  # MET (years)')
     plt.ylabel('Z offset (arcsec)')
-    plt.axis([1999, maxyear, -25, 10])
+    plt.axis([1999, maxyear, DEFAULT_MIN, 10])
     plt.grid()
+    min_plot_y = DEFAULT_MIN
     for fid in fids[det]:
         fidstats = detstats[detstats['id_num'] == fid]
         year = fidstats['tstart'] / 86400. / 365.25 + 1998.0
@@ -55,14 +59,23 @@ def plotfids(detstats, det, data_dir):
             continue
         y0 = np.median(fidstatsnorm['ang_y_med'])
         z0 = np.median(fidstatsnorm['ang_z_med'] + fidstatsnorm.sim_z_offset - sim_z_nom)
+        fid_min_y = np.min(fidstats['ang_y_med'] - y0)
+        fid_min_z = np.min(fidstats['ang_z_med'] - z0 + fidstats['sim_z_offset'] - sim_z_nom)
+        fid_min = np.min([fid_min_y, fid_min_z])
+        # if the plot min value is less than we've seen for this detector
+        # or less than the default, update the minimum (rounded down to the nearest 5)
+        if fid_min < min_plot_y:
+            min_plot_y = fid_min - (fid_min % 5)
         plt.subplot(2, 1, 1)
         plt.plot(year - year0, fidstats['ang_y_med'] - y0,
-                 ',', markerfacecolor=fidcolor[fid], mew=0,
+                 '.', markersize=4, markerfacecolor=fidcolor[fid], mew=0,
                  scaley=False, scalex=False)
+        plt.ylim(ymin=min_plot_y)
         plt.subplot(2, 1, 2)
         plt.plot(year - year0, fidstats['ang_z_med'] - z0 + fidstats['sim_z_offset'] - sim_z_nom,
-                 ',', markerfacecolor=fidcolor[fid], mew=0,
+                 '.', markersize=4, markerfacecolor=fidcolor[fid], mew=0,
                  scaley=False, scalex=False)
+        plt.ylim(ymin=min_plot_y)
     plt.savefig(os.path.join(data_dir, 'drift_%s.png' % re.sub(r'-', '_', det.lower())))
 
 
