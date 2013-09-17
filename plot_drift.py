@@ -68,12 +68,12 @@ def plotfids(detstats, det, data_dir):
             min_plot_y = fid_min - (fid_min % 5)
         plt.subplot(2, 1, 1)
         plt.plot(year - year0, fidstats['ang_y_med'] - y0,
-                 ',', markerfacecolor=fidcolor[fid], mew=0,
+                 '.', markersize=4, markerfacecolor=fidcolor[fid], mew=0,
                  scaley=False, scalex=False)
         plt.ylim(ymin=min_plot_y)
         plt.subplot(2, 1, 2)
         plt.plot(year - year0, fidstats['ang_z_med'] - z0 + fidstats['sim_z_offset'] - sim_z_nom,
-                 ',', markerfacecolor=fidcolor[fid], mew=0,
+                 '.', markersize=4, markerfacecolor=fidcolor[fid], mew=0,
                  scaley=False, scalex=False)
         plt.ylim(ymin=min_plot_y)
     plt.savefig(os.path.join(data_dir, 'drift_%s.png' % re.sub(r'-', '_', det.lower())))
