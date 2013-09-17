@@ -12,12 +12,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import Ska.DBI
 
+EXCLUDE_OBSIDS = '(2010, 2783, 1431, 1411)'
 
 def get_fid_stats(db, det):
-    query = ('select id_num, id_string, tstart, ang_y_med, ang_z_med, sim_z_offset'
+    query = ('select obsid, id_num, id_string, tstart, ang_y_med, ang_z_med, sim_z_offset'
              ' FROM fid_stats'
-             ' WHERE proc_status IS NULL AND id_string LIKE "{}%"'
-             .format(det))
+             ' WHERE proc_status IS NULL AND id_string LIKE "{}%" '
+             ' and obsid not in {} '
+             .format(det, EXCLUDE_OBSIDS))
     vals = db.fetchall(query)
     return vals
 
