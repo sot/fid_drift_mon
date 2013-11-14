@@ -26,16 +26,18 @@ import Ska.DBI
 from Chandra.Time import DateTime
 
 
-def get_fid_stats(det, start=None):
+def get_fid_stats(det, start=None, stop=None):
     if start is None:
         start = DateTime() - 365.0
     tstart = DateTime(start).secs
+    tstop = DateTime(stop).secs
     query = ('select id_num, id_string, tstart, ang_y_med, ang_z_med, sim_z_offset'
              ' FROM fid_stats'
              ' WHERE proc_status IS NULL'
              '   AND id_string LIKE "{}%"'
              '   AND tstart > {}'
-             .format(det, tstart))
+             '   AND tstart < {}'
+             .format(det, tstart, tstop))
 
     db = Ska.DBI.DBI(dbi='sybase', server='sybase', user='aca_read')
     vals = db.fetchall(query)
@@ -90,12 +92,12 @@ def calc_abs_cel_pointing(detstats, det):
     return dr
 
 
-def calc_all_dets():
+def calc_all_dets(start=None, stop=None):
     dets = ('ACIS-S', 'ACIS-I', 'HRC-S', 'HRC-I')
 
     drs = []
     for det in dets:
-        detstats = get_fid_stats(det)
+        detstats = get_fid_stats(det, start, stop)
         dr = calc_abs_cel_pointing(detstats, det)
         drs.append(dr)
 
@@ -103,3 +105,4 @@ def calc_all_dets():
     dr99 = np.percentile(dr, 99.0)
     print
     print '99th percentile radius for fid light offset from median is {:.1f} arcsec'.format(dr99)
+    return dr99
