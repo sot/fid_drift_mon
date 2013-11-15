@@ -46,7 +46,7 @@ def get_fid_stats(det, start=None, stop=None):
     return vals
 
 
-def calc_abs_cel_pointing(detstats, det):
+def calc_abs_cel_pointing(detstats, det, plot=True):
     year0 = 0.
     fids = {'ACIS-S': [1, 2, 3, 4, 5, 6],
             'ACIS-I': [1, 2, 3, 4, 5, 6],
@@ -55,16 +55,17 @@ def calc_abs_cel_pointing(detstats, det):
             }
     fidcolor = ' bgrcmkbgrcbgrc'
     sim_z_nom = np.median(detstats['sim_z_offset'])  # median for this detector
-    plt.figure(figsize=(6, 4.5))
-    plt.clf()
-    plt.subplot(2, 1, 1)
-    plt.ylabel('Y offset (arcsec)')
-    plt.title(det + ' Fid Drift')
-    plt.grid()
-    plt.subplot(2, 1, 2)
-    plt.xlabel('Year')  # MET (years)')
-    plt.ylabel('Z offset (arcsec)')
-    plt.grid()
+    if plot:
+        plt.figure(figsize=(6, 4.5))
+        plt.clf()
+        plt.subplot(2, 1, 1)
+        plt.ylabel('Y offset (arcsec)')
+        plt.title(det + ' Fid Drift')
+        plt.grid()
+        plt.subplot(2, 1, 2)
+        plt.xlabel('Year')  # MET (years)')
+        plt.ylabel('Z offset (arcsec)')
+        plt.grid()
     drs = []
     for fid in fids[det]:
         fidstats = detstats[detstats['id_num'] == fid]
@@ -76,14 +77,15 @@ def calc_abs_cel_pointing(detstats, det):
             continue
         y0 = np.median(fidstatsnorm['ang_y_med'])
         z0 = np.median(fidstatsnorm['ang_z_med'] + fidstatsnorm.sim_z_offset - sim_z_nom)
-        plt.subplot(2, 1, 1)
         dy = fidstats['ang_y_med'] - y0
         dz = fidstats['ang_z_med'] - z0 + fidstats['sim_z_offset'] - sim_z_nom
         dr = np.sqrt(dy ** 2 + dz ** 2)
-        plt.plot(year - year0, dy, ',', markerfacecolor=fidcolor[fid], mew=0)
-        plt.subplot(2, 1, 2)
-        plt.plot(year - year0, dz, ',', markerfacecolor=fidcolor[fid], mew=0)
         drs.append(dr)
+        if plot:
+            plt.subplot(2, 1, 1)
+            plt.plot(year - year0, dy, ',', markerfacecolor=fidcolor[fid], mew=0)
+            plt.subplot(2, 1, 2)
+            plt.plot(year - year0, dz, ',', markerfacecolor=fidcolor[fid], mew=0)
 
     dr = np.concatenate(drs)
     dr99 = np.percentile(dr, 99.0)
@@ -92,13 +94,13 @@ def calc_abs_cel_pointing(detstats, det):
     return dr
 
 
-def calc_all_dets(start=None, stop=None):
+def calc_all_dets(start=None, stop=None, plot=True):
     dets = ('ACIS-S', 'ACIS-I', 'HRC-S', 'HRC-I')
 
     drs = []
     for det in dets:
         detstats = get_fid_stats(det, start, stop)
-        dr = calc_abs_cel_pointing(detstats, det)
+        dr = calc_abs_cel_pointing(detstats, det, plot=plot)
         drs.append(dr)
 
     dr = np.concatenate(drs)
