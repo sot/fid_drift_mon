@@ -63,6 +63,19 @@
             <li><a href="drift_hrc_i.png">HRC-I drift</a>
           </ul>
 
+          <h4> Fid light commanded search position versus telemetry
+            (Updated <!--#CONFIG TIMEFMT="%x"--><!--#flastmod file="starcheck_telem.png"-->)</h4>
+
+          The data for this plot represents the difference in Y and Z between
+          the commanded search position for fids and the actual observed location.
+          The red dashed line represents the fid light search box half-width, at which
+          point the likelihood of a failed fid acquisition is high.  Within the green
+          dashed region (15 arcsec half-width) the likelihood of failure is low.
+
+          <center>
+            <p><img SRC="starcheck_telem.png">
+          </center>
+
           <h4> ACA CCD cooldown in late 2006</h4>
 
           Starting around 2006:320 there is a strong trend in the fid light

@@ -5,7 +5,8 @@ TASK = fid_drift_mon
 FLIGHT_ENV = SKA
 
 # Set the names of all files that get installed
-SHARE = fid_drift_mon.pl plot_drift.py plot_drift_model.py calc_abs_cel_pointing.py
+SHARE = fid_drift_mon.pl plot_drift.py plot_drift_model.py calc_abs_cel_pointing.py \
+	plot_starcheck_vs_telem.py
 DATA = task_schedule.cfg
 
 include /proj/sot/ska/include/Makefile.FLIGHT
