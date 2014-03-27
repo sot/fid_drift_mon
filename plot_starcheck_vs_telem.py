@@ -71,7 +71,10 @@ def get_fids_starcheck(dwells):
             fids = db.fetchall('SELECT obsid, slot, yang, zang FROM starcheck_catalog '
                                'WHERE obsid={} AND type="FID"'
                                .format(obsid))
-            fids_starcheck[obsid] = Table(fids)
+            if len(fids) > 0:
+                fids_starcheck[obsid] = Table(fids)
+            else:
+                logger.info('No fids found for obsid {} in starcheck_catalog'.format(obsid))
 
     return fids_starcheck
 
