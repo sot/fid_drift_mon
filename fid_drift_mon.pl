@@ -35,6 +35,11 @@ our @loglines;                  # All logged messages (per obsid) get stored her
 
 my $tmp_data_dir = tempdir(CLEANUP => 1); #
 chdir $tmp_data_dir or die "Could not change to tmp dir '$tmp_data_dir'\n";
+# Use END block to always change out of that temp directory at the end of the program
+# This should help with cleanup of the directory
+END {
+    chdir("/");
+}
 
 # Mostly for reference, here is the table creation command
 my $create_table_sql = <<CREATE_TABLE_SQL;
