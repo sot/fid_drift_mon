@@ -86,6 +86,9 @@ def get_dwells_with_fids(start, stop):
 
     :returns: dict of tables keyed by obsid (like starcheck fids)
     """
+    # Only get dwells that have an obsid
+    stop = min(DateTime(stop).date, events.obsids.all().reverse()[0].stop)
+
     logger.info('Getting dwells betweeen {} and {}'.format(start, stop))
     dwells = OrderedDict()
     for dwell in events.dwells.filter(start, stop):
