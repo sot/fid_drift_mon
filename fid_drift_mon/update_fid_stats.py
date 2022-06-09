@@ -4,6 +4,7 @@ Gather fid statistics and store in the fid_stats table an sqlite3 database.
 
 from pathlib import Path
 
+import astropy.units as u
 import numpy as np
 import Ska.DBI
 from astropy.table import Table, vstack
@@ -13,7 +14,7 @@ from kadi.commands import get_observations
 from mica.archive import asp_l1
 from ska_helpers.utils import basic_logger
 
-__version__ = "0.1"
+from . import __version__
 
 LOGGER = basic_logger(__name__)
 LOGGER.setLevel("DEBUG")
@@ -190,14 +191,24 @@ def calc_stats_for_fidpr(obs, acen, fidpr):
 def get_options(sys_args=None):
     import argparse
 
-    # RESTORE THIS LINE
-    # from . import __version__
-
     parser = argparse.ArgumentParser(description=f"get_fid_data {__version__}")
-    parser.add_argument("--start", type=str, help="Start date")
-    parser.add_argument("--stop", type=str, help="Stop date")
+    # fmt: off
     parser.add_argument(
-        "--data-dir", type=str, default=".", help="Data directory (default='.')"
+        "--data-dir",
+        type=str,
+        default=".",
+        help="Data directory (default='.')"
+    )
+    parser.add_argument(
+        "--stop",
+        type=str,
+        help="Stop date for processing (default=NOW)"
+    )
+    parser.add_argument(
+        "--lookback",
+        type=float,
+        default=30,
+        help="Number of days to look back before --stop (default=30)",
     )
     parser.add_argument(
         "--delete",
@@ -209,14 +220,17 @@ def get_options(sys_args=None):
     parser.add_argument(
         "--log-level",
         type=str,
-        help="logging level (debug, info, warning, error, critical)",
+        default="INFO",
+        help="logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL, default=INFO)",
     )
+    # fmt: on
     args = parser.parse_args(sys_args)
     return args
 
 
 def main():
     opt = get_options()
+    LOGGER.setLevel(opt.log_level)
 
     data_dir = Path(opt.data_dir)
     db3_path = data_dir / "fid_stats.db3"
@@ -225,7 +239,9 @@ def main():
         with Ska.DBI.DBI(dbi="sqlite", server=db3_path) as dbh:
             dbh.execute(TABLE_SQL)
 
-    obss = get_observations(opt.start, opt.stop)
+    stop = CxoTime(opt.stop)
+    start = stop - opt.lookback * u.day
+    obss = get_observations(start, stop)
 
     with Ska.DBI.DBI(dbi="sqlite", server=db3_path) as dbh:
         # Delete the specified (comma-sep) list of obsids first.  Mostly for testing.
