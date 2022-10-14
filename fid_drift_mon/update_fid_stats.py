@@ -134,7 +134,8 @@ def calc_fid_stats(obs, fidprops, acen):
     for fidpr in fidprops:
         if fidpr["id_status"].strip() != "GOOD":
             LOGGER.info(
-                f"WARNING: obsid {obs['obsid']} has bad fid status {fidpr['id_status']!r} in slot {fidpr['slot']}"
+                f"WARNING: obsid {obs['obsid']} has bad fid status "
+                f"{fidpr['id_status']!r} in slot {fidpr['slot']}"
             )
             continue
         stat = calc_stats_for_fidpr(obs, acen, fidpr)

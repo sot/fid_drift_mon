@@ -1,9 +1,7 @@
-#!/usr/bin/env python
-
 import argparse
-import os
 import re
 import time
+from pathlib import Path
 
 import matplotlib
 
@@ -11,6 +9,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import Ska.DBI
+
+from .paths import FID_STATS_PATH
 
 EXCLUDE_OBSIDS = "(2010, 2783, 1431, 1411)"
 
@@ -54,7 +54,7 @@ def plotfids(detstats, det, data_dir):
     for fid in fids[det]:
         fidstats = detstats[detstats["id_num"] == fid]
         year = fidstats["tstart"] / 86400.0 / 365.25 + 1998.0
-        normmask = np.logical_and(year > 2002.0, year < 2003.0)
+        normmask = np.logical_and(year > 2022.0, year < 2023.0)
         fidstatsnorm = fidstats[normmask]
         if len(fidstatsnorm) < 3:
             print("Fid %s %d" % (det, fid))
@@ -97,11 +97,13 @@ def plotfids(detstats, det, data_dir):
             scalex=False,
         )
         plt.ylim(ymin=min_plot_y)
-    plt.savefig(os.path.join(data_dir, "drift_%s.png" % re.sub(r"-", "_", det.lower())))
+
+    det = re.sub(r"-", "_", det.lower())
+    plt.savefig(Path(data_dir) / f"drift_{det}.png")
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Plot drift model")
+    parser = argparse.ArgumentParser(description="Plot drift data")
     parser.add_argument(
         "--data-dir", type=str, default=".", help="Fid drift data directory"
     )
@@ -113,14 +115,11 @@ def main():
     args = parse_args()
     dets = ("ACIS-S", "ACIS-I", "HRC-S", "HRC-I")
 
-    db = Ska.DBI.DBI(dbi="sybase", server="sybase", user="aca_read")
-
-    for det in dets:
-        # Some filtering here?
-        detstats = get_fid_stats(db, det)
-        plotfids(detstats, det, args.data_dir)
-
-    db.conn.close()
+    with Ska.DBI.DBI(dbi="sqlite", server=FID_STATS_PATH(args.data_dir)) as dbh:
+        for det in dets:
+            # Some filtering here?
+            detstats = get_fid_stats(dbh, det)
+            plotfids(detstats, det, args.data_dir)
 
 
 if __name__ == "__main__":
