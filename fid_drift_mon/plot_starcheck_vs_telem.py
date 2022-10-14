@@ -18,20 +18,21 @@ Plot positions of fid lights from starcheck versus the actual seen in telemetry.
 import argparse
 from collections import OrderedDict
 
-import numpy as np
 import matplotlib
+import numpy as np
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
+import Ska.DBI
 from astropy import table
 from astropy.table import Table
-
-from pyyaks.logger import get_logger
-from kadi import events
-import Ska.DBI
-from Ska.Matplotlib import plot_cxctime
-from Ska.engarchive import fetch_eng as fetch
 from Chandra.Time import DateTime
+from kadi import events
+from pyyaks.logger import get_logger
+from Ska.engarchive import fetch_eng as fetch
+from Ska.Matplotlib import plot_cxctime
+
+from .paths import FID_STATS_PATH
 
 logger = get_logger()
 
@@ -44,6 +45,9 @@ def get_opt(args):
     parser.add_argument('--stop',
                         type=str,
                         help='Stop date (default=NOW)')
+    parser.add_argument(
+        "--data-dir", type=str, default=".", help="Fid drift data directory"
+    )
     parser.add_argument('--out',
                         type=str,
                         help='Output plot file')
@@ -59,9 +63,9 @@ def get_fids_starcheck(dwells):
     :returns: dict of tables keyed by obsid
     """
 
-    logger.info('Getting fids from sybase starcheck table')
+    logger.info('Getting fids from commands')
     fids_starcheck = {}
-    with Ska.DBI.DBI(server='sybase', dbi='sybase', user='aca_read') as db:
+    with Ska.DBI.DBI(server='sqlite', dbi=FID_STATS_PATH(data_dir)) as db:
         for obsid, dwell in dwells.items():
             # Only accept the first dwell of science observations
             if obsid in fids_starcheck:
