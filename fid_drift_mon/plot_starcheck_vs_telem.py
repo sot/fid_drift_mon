@@ -56,7 +56,7 @@ def get_opt(args):
     return opt
 
 
-def get_fids_starcheck(dwells):
+def get_fids_starcheck(dwells, data_dir):
     """
     Get fid starcheck values corresponding to ``dwells`` (keyed by obsid)
 
@@ -195,7 +195,7 @@ def main(args=None):
     stop = DateTime(opt.stop)
 
     dwells = get_dwells_with_fids(start.date, stop.date)
-    fids_starcheck = get_fids_starcheck(dwells)
+    fids_starcheck = get_fids_starcheck(dwells, opt.data_dir)
     fids_telem = get_fids_telem(dwells, fids_starcheck)
     starcheck_telem = join_starcheck_telem(fids_starcheck, fids_telem)
     plot_starcheck_telem(starcheck_telem, savefig=opt.out)
