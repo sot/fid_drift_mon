@@ -169,7 +169,7 @@ def plot_starcheck_telem(starcheck_telem, savefig=None):
     plot_cxctime(tstart, dzag, '.b', label='Zag')
     plt.ylim(-40, 40)
     plt.grid()
-    plt.legend(fontsize='small', numpoints=1)
+    plt.legend(fontsize='small', numpoints=1, loc="lower left")
     plt.ylabel('Offset (arcsec)')
     plt.title('Fid light commanded vs. observed angles')
     x0, x1 = plt.xlim()
