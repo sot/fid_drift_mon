@@ -3,4 +3,4 @@ from pathlib import Path
 
 
 def FID_STATS_PATH(data_dir):
-    return Path(data_dir) / 'fid_stats.db3'
+    return Path(data_dir) / "fid_stats.db3"

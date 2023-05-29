@@ -41,8 +41,9 @@ def plotfids(detstats, det, data_dir):
     plt.subplot(2, 1, 1)
     plt.ylabel("Y offset (arcsec)")
     maxyear = int(time.strftime("%Y")) + 1
+    DEFAULT_MAX = 10  # arcsec
     DEFAULT_MIN = -25  # arcsec
-    plt.axis([1999, maxyear, DEFAULT_MIN, 10])
+    plt.axis([1999, maxyear, DEFAULT_MIN, DEFAULT_MAX])
     plt.title(det + " Fid Drift")
     plt.grid()
     plt.subplot(2, 1, 2)
@@ -51,10 +52,11 @@ def plotfids(detstats, det, data_dir):
     plt.axis([1999, maxyear, DEFAULT_MIN, 10])
     plt.grid()
     min_plot_y = DEFAULT_MIN
+    max_plot_y = DEFAULT_MAX
     for fid in fids[det]:
         fidstats = detstats[detstats["id_num"] == fid]
         year = fidstats["tstart"] / 86400.0 / 365.25 + 1998.0
-        normmask = np.logical_and(year > 2022.0, year < 2023.0)
+        normmask = np.logical_and(year > 2010.0, year < 2020.0)
         fidstatsnorm = fidstats[normmask]
         if len(fidstatsnorm) < 3:
             print("Fid %s %d" % (det, fid))
@@ -68,11 +70,18 @@ def plotfids(detstats, det, data_dir):
         fid_min_z = np.min(
             fidstats["ang_z_med"] - z0 + fidstats["sim_z_offset"] - sim_z_nom
         )
+        fid_max_y = np.max(fidstats["ang_y_med"] - y0)
+        fid_max_z = np.max(
+            fidstats["ang_z_med"] - z0 + fidstats["sim_z_offset"] - sim_z_nom
+        )
         fid_min = np.min([fid_min_y, fid_min_z])
+        fid_max = np.max([fid_max_y, fid_max_z])
         # if the plot min value is less than we've seen for this detector
         # or less than the default, update the minimum (rounded down to the nearest 5)
         if fid_min < min_plot_y:
             min_plot_y = fid_min - (fid_min % 5)
+        if fid_max > max_plot_y:
+            max_plot_y = fid_max + (5 - fid_max % 5)
         plt.subplot(2, 1, 1)
         plt.plot(
             year - year0,
@@ -84,7 +93,7 @@ def plotfids(detstats, det, data_dir):
             scaley=False,
             scalex=False,
         )
-        plt.ylim(ymin=min_plot_y)
+        plt.ylim(ymin=min_plot_y, ymax=max_plot_y)
         plt.subplot(2, 1, 2)
         plt.plot(
             year - year0,
@@ -96,7 +105,7 @@ def plotfids(detstats, det, data_dir):
             scaley=False,
             scalex=False,
         )
-        plt.ylim(ymin=min_plot_y)
+        plt.ylim(ymin=min_plot_y, ymax=max_plot_y)
 
     det = re.sub(r"-", "_", det.lower())
     plt.savefig(Path(data_dir) / f"drift_{det}.png")
