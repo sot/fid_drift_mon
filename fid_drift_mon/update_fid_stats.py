@@ -12,7 +12,7 @@ from chandra_aca.transform import count_rate_to_mag
 from cxotime import CxoTime
 from kadi.commands import get_observations
 from mica.archive import asp_l1
-from ska_helpers.utils import basic_logger
+from ska_helpers.logging import basic_logger
 
 from . import __version__
 
@@ -22,6 +22,7 @@ LOGGER.setLevel("DEBUG")
 TABLE_SQL = """
 create table fid_stats (
     obsid int,
+    slot int,
     id_num int,
     id_string varchar(10),
     tstart float,
@@ -164,6 +165,7 @@ def calc_stats_for_fidpr(obs, acen, fidpr):
     # SIM_Z offset in arcsec (using 20.493 arcsec/mm)
     sim_z_offset = (fidpr.meta["LSI0STT3"] + fidpr.meta["STT0STF3"]) * 20.493
     stat = {
+        "slot": slot,
         "id_num": fidpr["id_num"],
         "id_string": fidpr["id_string"],
         "tstart": CxoTime(obs["obs_start"]).secs,
