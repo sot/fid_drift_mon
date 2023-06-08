@@ -1,6 +1,7 @@
 import argparse
 import re
 import time
+import shutil
 from pathlib import Path
 
 import matplotlib
@@ -129,6 +130,11 @@ def main():
             # Some filtering here?
             detstats = get_fid_stats(dbh, det)
             plotfids(detstats, det, args.data_dir)
+
+    # Copy the index template into the output directory
+    shutil.copyfile(
+        Path(__file__).parent / "data" / "index_template.html",
+        Path(args.data_dir) / "index.html")
 
 
 if __name__ == "__main__":

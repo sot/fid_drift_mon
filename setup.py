@@ -3,7 +3,6 @@ from setuptools import setup
 
 entry_points = {
     "console_scripts": [
-        "fid_drift_mon_copy_index = fid_drift_mon.copy_index:main",
         "fid_drift_mon_update_fid_stats = fid_drift_mon.update_fid_stats:main",
         "fid_drift_mon_plot_drift = fid_drift_mon.plot_drift:main",
         "fid_drift_mon_plot_drift_model = fid_drift_mon.plot_drift_model:main",
