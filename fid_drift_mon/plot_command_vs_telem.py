@@ -17,19 +17,18 @@ Plot positions of fid lights from commands versus the actual seen in telemetry.
 
 import argparse
 from collections import OrderedDict
-
 import matplotlib
-
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import Ska.DBI
+import ska_dbi
 from astropy import table
 from astropy.table import Table
-from Chandra.Time import DateTime
+import astropy.units as u
+
+from cxotime import CxoTime
 from kadi import events
 from kadi.commands import observations
 from pyyaks.logger import get_logger
-from Ska.Matplotlib import plot_cxctime
+from ska_matplotlib import plot_cxctime
 
 from .paths import FID_STATS_PATH
 
@@ -97,7 +96,7 @@ def get_dwells_with_fids(start, stop):
     :returns: dict of tables keyed by obsid (like commands fids)
     """
     # Only get dwells that have an obsid
-    stop = min(DateTime(stop).date, events.obsids.all().reverse()[0].stop)
+    stop = min(CxoTime(stop).date, events.obsids.all().reverse()[0].stop)
 
     logger.info("Getting dwells betweeen {} and {}".format(start, stop))
     dwells = OrderedDict()
@@ -196,13 +195,14 @@ def plot_commands_telem(commands_telem, savefig=None):
 
 def main(args=None):
     opt = get_opt(args)
+    matplotlib.use("Agg")
 
-    start = DateTime(opt.start) - 90 if opt.start is None else DateTime(opt.start)
-    stop = DateTime(opt.stop)
+    start = CxoTime(opt.start) - 90 * u.day if opt.start is None else CxoTime(opt.start)
+    stop = CxoTime(opt.stop)
 
     dwells = get_dwells_with_fids(start.date, stop.date)
     fids_commands = get_fids_commands(dwells, opt.data_dir)
-    with Ska.DBI.DBI(dbi="sqlite", server=FID_STATS_PATH(opt.data_dir)) as dbh:
+    with ska_dbi.DBI(dbi="sqlite", server=FID_STATS_PATH(opt.data_dir)) as dbh:
         fids_telem = get_fids_telem(dwells, fids_commands, dbh)
     commands_telem = join_commands_telem(fids_commands, fids_telem)
     plot_commands_telem(commands_telem, savefig=opt.out)

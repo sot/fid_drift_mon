@@ -4,14 +4,13 @@ import argparse
 
 import matplotlib
 
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-import Ska.DBI
+import ska_dbi
 
-from Ska.Matplotlib import plot_cxctime
-import Ska.engarchive.fetch as fetch
-from Chandra.Time import DateTime
+from ska_matplotlib import plot_cxctime
+import cheta.fetch as fetch
+from cxotime import CxoTime
 
 from .paths import FID_STATS_PATH
 
@@ -86,9 +85,12 @@ def parse_args(args):
 
 def main(args=None):
     args = parse_args(args)
-    tstart = DateTime().secs - args.n_days * 86400.0
 
-    with Ska.DBI.DBI(dbi="sqlite", server=FID_STATS_PATH(args.data_dir)) as dbh:
+    matplotlib.use("Agg")
+
+    tstart = CxoTime.now().secs - args.n_days * 86400.0
+
+    with ska_dbi.DBI(dbi="sqlite", server=FID_STATS_PATH(args.data_dir)) as dbh:
         detstats = get_fid_stats(dbh, "ACIS")
         fig, ax1 = plotfids(detstats, "ACIS", tstart)
 
@@ -97,7 +99,7 @@ def main(args=None):
     yoff = -2.5
     dat0 = 294.6
     adjtemps = -13 - (dat.vals - dat0) * 4 + yoff
-    ok = dat.times < DateTime("2011:186").secs
+    ok = dat.times < CxoTime("2011:186").secs
     if sum(ok) > 0:
         plot_cxctime(dat.times[ok], adjtemps[ok], "-r", ax=ax1, fig=fig)
     if sum(~ok) > 0:
@@ -112,7 +114,7 @@ def main(args=None):
         )
 
     adjtemps = -6.5 - (dat.vals - dat0) * 4 + yoff
-    ok = dat.times > DateTime("2011:193").secs
+    ok = dat.times > CxoTime("2011:193").secs
     if sum(ok) > 0:
         plot_cxctime(
             dat.times[ok],

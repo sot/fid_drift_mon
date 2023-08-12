@@ -3,13 +3,11 @@ import re
 import time
 import shutil
 from pathlib import Path
-
 import matplotlib
-
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-import Ska.DBI
+
+import ska_dbi
 
 from .paths import FID_STATS_PATH
 
@@ -123,9 +121,12 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    matplotlib.use("Agg")
+
     dets = ("ACIS-S", "ACIS-I", "HRC-S", "HRC-I")
 
-    with Ska.DBI.DBI(dbi="sqlite", server=FID_STATS_PATH(args.data_dir)) as dbh:
+    with ska_dbi.DBI(dbi="sqlite", server=FID_STATS_PATH(args.data_dir)) as dbh:
         for det in dets:
             # Some filtering here?
             detstats = get_fid_stats(dbh, det)

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import astropy.units as u
 import numpy as np
-import Ska.DBI
+import ska_dbi
 from astropy.table import Table, vstack
 from chandra_aca.transform import count_rate_to_mag
 from cxotime import CxoTime
@@ -239,14 +239,14 @@ def main():
     db3_path = data_dir / "fid_stats.db3"
 
     if not db3_path.exists():
-        with Ska.DBI.DBI(dbi="sqlite", server=db3_path) as dbh:
+        with ska_dbi.DBI(dbi="sqlite", server=db3_path) as dbh:
             dbh.execute(TABLE_SQL)
 
     stop = CxoTime(opt.stop)
     start = stop - opt.lookback * u.day
     obss = get_observations(start, stop)
 
-    with Ska.DBI.DBI(dbi="sqlite", server=db3_path) as dbh:
+    with ska_dbi.DBI(dbi="sqlite", server=db3_path) as dbh:
         # Delete the specified (comma-sep) list of obsids first.  Mostly for testing.
         for obsid in opt.delete:
             delete_obs(dbh, obsid)
