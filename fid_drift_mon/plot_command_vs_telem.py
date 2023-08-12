@@ -17,13 +17,13 @@ Plot positions of fid lights from commands versus the actual seen in telemetry.
 
 import argparse
 from collections import OrderedDict
+
+import astropy.units as u
 import matplotlib
 import matplotlib.pyplot as plt
 import ska_dbi
 from astropy import table
 from astropy.table import Table
-import astropy.units as u
-
 from cxotime import CxoTime
 from kadi import events
 from kadi.commands import observations
@@ -31,7 +31,6 @@ from pyyaks.logger import get_logger
 from ska_matplotlib import plot_cxctime
 
 from .paths import FID_STATS_PATH
-
 
 logger = get_logger()
 

@@ -1,19 +1,16 @@
 #!/usr/bin/env python
-import os
 import argparse
+import os
 
+import cheta.fetch as fetch
 import matplotlib
-
 import matplotlib.pyplot as plt
 import numpy as np
 import ska_dbi
-
-from ska_matplotlib import plot_cxctime
-import cheta.fetch as fetch
 from cxotime import CxoTime
+from ska_matplotlib import plot_cxctime
 
 from .paths import FID_STATS_PATH
-
 
 plt.rc("axes", labelsize=10)
 plt.rc("xtick", labelsize=10)

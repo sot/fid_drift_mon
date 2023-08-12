@@ -1,12 +1,12 @@
 import argparse
 import re
-import time
 import shutil
+import time
 from pathlib import Path
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-
 import ska_dbi
 
 from .paths import FID_STATS_PATH
@@ -135,7 +135,8 @@ def main():
     # Copy the index template into the output directory
     shutil.copyfile(
         Path(__file__).parent / "data" / "index_template.html",
-        Path(args.data_dir) / "index.html")
+        Path(args.data_dir) / "index.html",
+    )
 
 
 if __name__ == "__main__":

@@ -16,11 +16,11 @@ Compute the 99th percentile radius for fid light offsets over the last year.
   99th percentile radius for fid light offset from median is 11.8 arcsec
 """
 import argparse
+
+import astropy.units as u
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import astropy.units as u
-
 import ska_dbi
 from cxotime import CxoTime
 

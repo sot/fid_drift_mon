@@ -21,7 +21,5 @@ setup(
     setup_requires=["setuptools_scm", "setuptools_scm_git_archive"],
     entry_points=entry_points,
     install_package_data=True,
-    package_data={
-        "fid_drift_mon": ["data/index_template.html", "task_schedule.cfg"]
-    },
+    package_data={"fid_drift_mon": ["data/index_template.html", "task_schedule.cfg"]},
 )
