@@ -160,7 +160,6 @@ def calc_stats_for_fidpr(obs, acen, fidpr):
         )
         return
 
-
     ang_y_sm = cen["ang_y_sm"] * 3600
     ang_z_sm = cen["ang_z_sm"] * 3600
     # SIM_Z offset in arcsec (using 20.493 arcsec/mm)
