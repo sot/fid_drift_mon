@@ -160,7 +160,6 @@ def calc_stats_for_fidpr(obs, acen, fidpr):
         )
         return
 
-    props_samples = 1000 if n_cen >= 1000 else n_cen
 
     ang_y_sm = cen["ang_y_sm"] * 3600
     ang_z_sm = cen["ang_z_sm"] * 3600
@@ -173,8 +172,8 @@ def calc_stats_for_fidpr(obs, acen, fidpr):
         "tstart": CxoTime(obs["obs_start"]).secs,
         "obsid": obs["obsid"],
         "date_obs": obs["obs_start"],
-        "ang_y_med": np.median(ang_y_sm[0:props_samples]),
-        "ang_z_med": np.median(ang_z_sm[0:props_samples]),
+        "ang_y_med": np.median(ang_y_sm[-1000:]),
+        "ang_z_med": np.median(ang_z_sm[-1000:]),
         "ang_y_5th": np.percentile(ang_y_sm, 5),
         "ang_y_95th": np.percentile(ang_y_sm, 95),
         "ang_z_5th": np.percentile(ang_z_sm, 5),
