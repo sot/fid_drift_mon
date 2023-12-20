@@ -15,8 +15,7 @@
           <h2> <font color="#990000">Fiducial light drift</font></h2>
 
           This page shows the drift of fiducial light positions over the course
-          of the mission.  Since launch, there has been a drift
-          of about 12 arcsec along both spacecraft Y and Z.
+          of the mission.
           This apparent drift in position can be due to a combination of any of the
           following factors:
           <ul>
@@ -26,16 +25,10 @@
             <li> Alignment drift in the FTS
           </ul>
 
-          The first three factors are nearly degenerate, and could only be
-          distinguished by determining if the X-ray PSF of sources at the nominal
-          aimpoint has degraded due to the 9 arcsec drift.
+          The first three factors are nearly degenerate.
 
           Only the last factor (FTS alignment drift) produces a change in the
-          boresight calibration (i.e. celestial location offset).  Based on the
-          time history of the <a
-            href="http://cxc.harvard.edu/mta/ASPECT/boresight/UPDATE_2002-Apr/">
-            boresight alignment</a>, the FTS alignment has drifted 2.7 arcsec in the
-          Y-axis and -1.2 arcsec in the Z-axis.
+          boresight calibration (i.e. celestial location offset)
 
           <h4> Fid light drifts (Updated <!--#CONFIG TIMEFMT="%x"--><!--#flastmod file="drift_acis_s.png"-->)</h4>
 
@@ -64,7 +57,8 @@
             (Updated <!--#CONFIG TIMEFMT="%x"--><!--#flastmod file="starcheck_telem.png"-->)</h4>
 
           The data for this plot represents the difference in Y and Z between
-          the commanded search position for fids and the actual observed location.
+          the commanded search position for fids and the actual observed location at the
+          beginning of each observation.
           The red dashed line represents the fid light search box half-width, at which
           point the likelihood of a failed fid acquisition is high.  Within the green
           dashed region (35 arcsec half-width) the likelihood of failure is low.
