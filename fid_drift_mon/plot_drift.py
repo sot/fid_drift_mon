@@ -18,7 +18,7 @@ def get_fid_stats(db, det):
     query = (
         "select obsid, id_num, id_string, tstart, ang_y_med, ang_z_med, sim_z_offset"
         " FROM fid_stats"
-        ' WHERE proc_status IS NULL AND id_string LIKE "{}%" '
+        ' WHERE id_string LIKE "{}%" '
         " and obsid not in {} ".format(det, EXCLUDE_OBSIDS)
     )
     vals = db.fetchall(query)
