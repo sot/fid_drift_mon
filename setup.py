@@ -7,6 +7,7 @@ entry_points = {
         "fid_drift_mon_plot_drift = fid_drift_mon.plot_drift:main",
         "fid_drift_mon_plot_drift_model = fid_drift_mon.plot_drift_model:main",
         "fid_drift_mon_plot_command_vs_telem = fid_drift_mon.plot_command_vs_telem:main",
+        "fid_drift_mon_install_report = fid_drift_mon.install_report:main",
     ]
 }
 
