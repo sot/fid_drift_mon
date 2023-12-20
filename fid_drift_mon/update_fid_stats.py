@@ -37,8 +37,6 @@ create table fid_stats (
     mag_i_avg float,
     exp_time  float,
     sim_z_offset float,
-    ap_date datetime,
-    proc_status varchar(40)
 ) ;
 create index fid_stats_obsid_index on fid_stats ( obsid ) ;
 """
