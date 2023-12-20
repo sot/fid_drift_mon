@@ -35,7 +35,7 @@ from .paths import FID_STATS_PATH
 logger = get_logger()
 
 
-def get_opt(args):
+def get_opt():
     parser = argparse.ArgumentParser(
         description="Commanded vs. telemetry fid positions"
     )
@@ -45,12 +45,10 @@ def get_opt(args):
         "--data-dir", type=str, default=".", help="Fid drift data directory"
     )
     parser.add_argument("--out", type=str, help="Output plot file")
-
-    opt = parser.parse_args(args)
-    return opt
+    return parser
 
 
-def get_fids_commands(dwells, data_dir):
+def get_fids_commands(dwells):
     """
     Get fid command values corresponding to ``dwells`` (keyed by obsid)
 
@@ -192,15 +190,15 @@ def plot_commands_telem(commands_telem, savefig=None):
         plt.savefig(savefig)
 
 
-def main(args=None):
-    opt = get_opt(args)
+def main(sys_args=None):
+    opt = get_opt().parse_args(sys_args)
     matplotlib.use("Agg")
 
     start = CxoTime(opt.start) - 90 * u.day if opt.start is None else CxoTime(opt.start)
     stop = CxoTime(opt.stop)
 
     dwells = get_dwells_with_fids(start.date, stop.date)
-    fids_commands = get_fids_commands(dwells, opt.data_dir)
+    fids_commands = get_fids_commands(dwells)
     with ska_dbi.DBI(dbi="sqlite", server=FID_STATS_PATH(opt.data_dir)) as dbh:
         fids_telem = get_fids_telem(dwells, fids_commands, dbh)
     commands_telem = join_commands_telem(fids_commands, fids_telem)
