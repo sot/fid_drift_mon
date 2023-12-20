@@ -209,6 +209,11 @@ def get_options(sys_args=None):
         help="Stop date for processing (default=NOW)"
     )
     parser.add_argument(
+        "--obsid",
+        type=int,
+        help="Obsid to process manually"
+    )
+    parser.add_argument(
         "--lookback",
         type=float,
         default=30,
@@ -243,9 +248,12 @@ def main():
         with ska_dbi.DBI(dbi="sqlite", server=db3_path) as dbh:
             dbh.execute(TABLE_SQL)
 
-    stop = CxoTime(opt.stop)
-    start = stop - opt.lookback * u.day
-    obss = get_observations(start, stop)
+    if opt.obsid:
+        obss = get_observations(obsid=opt.obsid)
+    else:
+        stop = CxoTime(opt.stop)
+        start = stop - opt.lookback * u.day
+        obss = get_observations(start, stop)
 
     with ska_dbi.DBI(dbi="sqlite", server=db3_path) as dbh:
         # Delete the specified (comma-sep) list of obsids first.  Mostly for testing.
