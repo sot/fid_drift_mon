@@ -16,9 +16,7 @@ def INDEX_TEMPLATE_PATH():
 
 
 def get_opt():
-    parser = argparse.ArgumentParser(
-        description="Install report and plots"
-    )
+    parser = argparse.ArgumentParser(description="Install report and plots")
     parser.add_argument(
         "--data-dir", type=str, default=".", help="Fid drift data directory"
     )
@@ -36,17 +34,14 @@ def main(sys_args=None):
         web_dir.mkdir(parents=True)
 
     index_template_html = INDEX_TEMPLATE_PATH().read_text()
-    out_html = web_dir / 'index.html'
+    out_html = web_dir / "index.html"
     logger.info(f"Writing HTML to {out_html}")
     out_html.write_text(index_template_html)
 
     # Copy the pngs from data to web
-    for png in data_dir.glob('*.png'):
+    for png in data_dir.glob("*.png"):
         shutil.copy(png, web_dir / png.name)
 
 
 if __name__ == "__main__":
     main()
-
-
-
