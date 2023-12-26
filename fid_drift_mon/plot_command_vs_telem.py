@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-Plot positions of fid lights from commands versus the actual seen in telemetry.
+Plot positions of fid lights from commands and the actual values seen in telemetry.
 ::
 
   Usage: plot_commands_vs_telem.py [-h] [--start START] [--stop STOP]
@@ -12,6 +12,7 @@ Plot positions of fid lights from commands versus the actual seen in telemetry.
     -h, --help     show this help message and exit
     --start START  Start date (default=NOW - 90 days)
     --stop STOP    Stop date (default=NOW)
+    --data-dir DATA_DIR (default ".")
     --out OUT      Output plot file
 """
 
@@ -50,10 +51,17 @@ def get_opt():
 
 def get_fids_commands(dwells):
     """
-    Get fid command values corresponding to ``dwells`` (keyed by obsid)
+    Get fid commanded values from star catalogs corresponding to ``dwells`` (keyed by obsid).
 
-    :returns: dict of tables keyed by obsid
-    """
+    Parameters:
+    -----------
+    dwells : dict
+        Dictionary of dwells keyed by obsid.
+
+    Returns:
+    --------
+    dict
+        Dictionary of astropy Tables keyed by obsid including slot, yang, zang etc for each fid.
 
     logger.info("Getting fids from commands")
     fids_commands = {}
@@ -111,12 +119,23 @@ def get_dwells_with_fids(start, stop):
 
 def get_fids_telem(dwells, fids_commands, dbh):
     """
-    Get telemetry yag, zag values for each fid in ``fids_commands`` at the start
-    of the corresponding ``dwells``.
+    Retrieve the fid position yag, zag values from the fid stats database for each commanded
+    fid in ``fids_commands`` at the start of the corresponding dwell in ``dwells``.
 
-    :returns: dict of tables keyed by obsid (like commands fids)
+    Parameters
+    ----------
+    dwells : dict
+        A dictionary of dwells keyed by obsid.
+    fids_commands : dict
+        A dictionary of the fid positions from star catalog commands fids keyed by obsid.
+    dbh : object
+        The database handler object.
+
+    Returns
+    -------
+    dict
+        A dictionary of astropy Tables keyed by obsid, containing telemetry aoacyan aoaczan for each fid.
     """
-
     fids_telem = {}
 
     for obsid, dwell in dwells.items():
@@ -142,7 +161,22 @@ def get_fids_telem(dwells, fids_commands, dbh):
 
 def join_commands_telem(fids_commands, fids_telem):
     """
-    Remake dict of tables into a single table for each structure
+    Join data from ``fids_commands`` and ``fids_telem`` into a single table.
+
+    The ``fids_commands`` and ``fids_telem`` dictionaries are keyed by obsid and contain astropy Tables.
+    The returned table contains the columns from both tables, joined on obsid and slot.
+
+    Parameters
+    ----------
+    fids_commands : dict
+        A dictionary of astropy Tables containing star catalog fid positions for each obsid.
+    fids_telem : dict
+        A dictionary of astropy Tables containing observed fid positions for each obsid.
+
+    Returns
+    -------
+    commands_telem : table
+        A single astropy Table containing joined command and telemetry data.
     """
     # Stack the dict of tables into a single table
     t_fids_commands = table.vstack(
@@ -167,6 +201,22 @@ def join_commands_telem(fids_commands, fids_telem):
 
 
 def plot_commands_telem(commands_telem, savefig=None):
+    """
+    Plot the commanded and observed angles for the fid lights.
+
+    Parameters
+    ----------
+    commands_telem : astropy Table
+        A dTable containing fid light commanded and observed angles.
+    savefig : str, optional
+        The filepath to save the plot as an image file. Defaults to None.
+
+    Returns
+    -------
+    None
+        This function does not return anything.
+
+    """
     plt.close(1)
     plt.figure(1, figsize=(6, 4))
     tstart = commands_telem["tstart"]

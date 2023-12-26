@@ -62,6 +62,22 @@ FORMAT_ROUND = dict(
 
 
 def process_obs(dbh, obs):
+    """
+    Process the observation data and insert the fid statistics into the database.
+
+    Parameters
+    ----------
+    dbh : database handle
+        The database handle object.
+    obs : dict
+        The observation data.
+
+    Returns
+    -------
+    None
+    """
+    from ska_dbi import DatabaseHandler
+
     obsid = obs["obsid"]
     if obsid > 38000:
         return
@@ -96,6 +112,24 @@ def process_obs(dbh, obs):
 
 
 def get_archive_file_data(obs, content, max_files=None):
+    """
+    Get archive file data for a given observation.  This is used for FIDPROPS and ACACENT content type
+    files.
+
+    Parameters
+    ----------
+    obs : dict
+        The observation details.
+    content : str
+        The mica asp_l1 CONTENT of the files to retrieve.
+    max_files : int, optional
+        The maximum number of files to retrieve.
+
+    Returns
+    -------
+    out : Table
+        The combined data from the retrieved files.
+    """
     files = asp_l1.get_files(
         start=obs["obs_start"], stop=obs["obs_stop"], content=[content]
     )
@@ -125,13 +159,43 @@ def get_archive_file_data(obs, content, max_files=None):
 
 
 def delete_obs(dbh, obsid):
+    """
+    Delete the fid_stats entries for a given obsid.
+
+    Parameters
+    ----------
+    dbh : object
+        The database connection object.
+    obsid : int
+        The obsid for which fid_stats entries need to be deleted.
+
+    Returns
+    -------
+    None
+
+    """
     LOGGER.info(f"Deleting fid_stats entries for obsid {obsid}")
     dbh.execute(f"delete from fid_stats where obsid={obsid}")
 
 
 def calc_fid_stats(obs, fidprops, acen):
     """
-    Calculate fid statistics
+    Calculate fid statistics.
+
+    Parameters
+    ----------
+    obs : dict
+        The observation dictionary.
+    fidprops : astropy Table
+        The FIDPROPS data.
+    acen : astropy Table
+        aspect L1 centroids
+
+    Returns
+    -------
+    stats: list
+        The list of dicts of fid statistics.
+
     """
     stats = []
     for fidpr in fidprops:
@@ -149,7 +213,25 @@ def calc_fid_stats(obs, fidprops, acen):
 
 
 def calc_stats_for_fidpr(obs, acen, fidpr):
-    t_int = 1.696
+    """
+    Calculate statistics for an individual fid light
+
+    Parameters
+    ----------
+    obs : dict
+        Dictionary containing observation information.
+    acen : astropy Table
+        astropy Table of aspect L1 centroid data
+    fidpr : astropy Row
+        astropy Row of fidprops data
+
+    Returns
+    -------
+    stat: dict
+        Dictionary containing calculated statistics for single fid light in an observation
+
+    """
+    t_int = 1.696  # Assume 1.696 sec integration time
     slot = fidpr["slot"]
     ok = (acen["slot"] == slot) & (acen["alg"] == 8) & (acen["status"] == 0)
     cen = acen[ok]
