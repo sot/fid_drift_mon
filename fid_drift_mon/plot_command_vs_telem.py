@@ -165,7 +165,7 @@ def get_fids_telem(dwells, fids_commands, dbh):
             continue
 
         rows = dbh.fetchall(
-            f"""SELECT tstart, obsid, slot, ang_y_med, ang_z_med from fid_stats
+            f"""SELECT tstart, obsid, slot, ang_y_start_med, ang_z_start_med from fid_stats
                              where obsid = {obsid}"""
         )
 
