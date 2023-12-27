@@ -4,6 +4,7 @@ Gather fid statistics and store in the fid_stats table an sqlite3 database.
 
 from pathlib import Path
 
+import argparse
 import astropy.units as u
 import numpy as np
 import ska_dbi
@@ -277,26 +278,14 @@ def calc_stats_for_fidpr(obs, acen, fidpr):
 
 
 def get_options(sys_args=None):
-    import argparse
-
     parser = argparse.ArgumentParser(description=f"get_fid_data {__version__}")
-    # fmt: off
     parser.add_argument(
-        "--data-dir",
-        type=str,
-        default=".",
-        help="Data directory (default='.')"
+        "--data-dir", type=str, default=".", help="Data directory (default='.')"
     )
     parser.add_argument(
-        "--stop",
-        type=str,
-        help="Stop date for processing (default=NOW)"
+        "--stop", type=str, help="Stop date for processing (default=NOW)"
     )
-    parser.add_argument(
-        "--obsid",
-        type=int,
-        help="Obsid to process manually"
-    )
+    parser.add_argument("--obsid", type=int, help="Obsid to process manually")
     parser.add_argument(
         "--lookback",
         type=float,
@@ -316,13 +305,11 @@ def get_options(sys_args=None):
         default="INFO",
         help="logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL, default=INFO)",
     )
-    # fmt: on
-    args = parser.parse_args(sys_args)
-    return args
+    return parser
 
 
-def main():
-    opt = get_options()
+def main(sys_args=None):
+    opt = get_options().parse_args(sys_args)
     LOGGER.setLevel(opt.log_level)
 
     data_dir = Path(opt.data_dir)
