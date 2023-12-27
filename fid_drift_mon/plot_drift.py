@@ -121,7 +121,9 @@ def parse_args():
     parser.add_argument(
         "--data-dir", type=str, default=".", help="Fid drift data directory"
     )
-    parser.add_argument("--web-dir", type=str, default=".", help="Output web directory")
+    parser.add_argument(
+        "--web-dir", type=str, default=".", help="Output web directory"
+    )
     return parser
     args = parser.parse_args()
     return args
