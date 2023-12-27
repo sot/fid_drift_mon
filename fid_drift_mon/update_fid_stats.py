@@ -1,5 +1,6 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-Gather fid statistics and store in the fid_stats table an sqlite3 database.
+Gather fid statistics and store in the fid_stats table in a sqlite3 database.
 """
 
 from pathlib import Path
@@ -77,8 +78,6 @@ def process_obs(dbh, obs):
     -------
     None
     """
-    from ska_dbi import DatabaseHandler
-
     obsid = obs["obsid"]
     if obsid > 38000:
         return
@@ -114,8 +113,9 @@ def process_obs(dbh, obs):
 
 def get_archive_file_data(obs, content, max_files=None):
     """
-    Get archive file data for a given observation.  This is used for FIDPROPS and ACACENT content type
-    files.
+    Get archive file data for a given observation.
+
+    This is used for FIDPROPS and ACACENT content type files.
 
     Parameters
     ----------

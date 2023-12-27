@@ -154,7 +154,8 @@ def get_fids_telem(dwells, fids_commands, dbh):
     Returns
     -------
     dict
-        A dictionary of astropy Tables keyed by obsid, containing telemetry aoacyan aoaczan for each fid.
+        A dictionary of astropy Tables keyed by obsid, containing telemetry
+        aoacyan aoaczan for each fid.
     """
     fids_telem = {}
 
@@ -183,8 +184,9 @@ def join_commands_telem(fids_commands, fids_telem):
     """
     Join data from ``fids_commands`` and ``fids_telem`` into a single table.
 
-    The ``fids_commands`` and ``fids_telem`` dictionaries are keyed by obsid and contain astropy Tables.
-    The returned table contains the columns from both tables, joined on obsid and slot.
+    The ``fids_commands`` and ``fids_telem`` dictionaries are keyed by obsid and contain
+    astropy Tables. The returned table contains the columns from both tables, joined on obsid
+    and slot.
 
     Parameters
     ----------
