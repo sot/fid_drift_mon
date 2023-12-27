@@ -28,12 +28,13 @@ from astropy.table import Table
 from cxotime import CxoTime
 from kadi import events
 from kadi.commands import observations
-from pyyaks.logger import get_logger
 from ska_matplotlib import plot_cxctime
+from ska_helpers.logging import basic_logger
 
 from .paths import FID_STATS_PATH
 
-logger = get_logger()
+LOGGER = basic_logger(__name__)
+LOGGER.setLevel("DEBUG")
 
 
 def get_opt():
@@ -63,23 +64,24 @@ def get_fids_commands(dwells):
     dict
         Dictionary of astropy Tables keyed by obsid including slot, yang, zang etc for each fid.
 
-    logger.info("Getting fids from commands")
+    """
+    LOGGER.info("Getting fids from commands")
     fids_commands = {}
 
     for obsid, dwell in dwells.items():
         # Only accept the first dwell of science observations
         if obsid in fids_commands:
-            logger.info("Skipping obsid {} already in fids_commands".format(obsid))
+            LOGGER.info(f"Skipping obsid {obsid} already in fids_commands")
             continue
 
         try:
             starcats = observations.get_starcats(obsid=obsid)
         except ValueError:
-            logger.info("Skipping obsid {} with no starcat".format(obsid))
+            LOGGER.info(f"Skipping obsid {obsid} with no starcat")
             continue
 
         if len(starcats) == 0:
-            logger.info("Skipping obsid {} with no starcat".format(obsid))
+            LOGGER.info(f"Skipping obsid {obsid} with no starcat")
             continue
 
         starcat = starcats[0]
@@ -88,29 +90,47 @@ def get_fids_commands(dwells):
         if len(fids) > 0:
             fids_commands[obsid] = Table(fids)
         else:
-            logger.info("No fids found for obsid {} in kadi starcats".format(obsid))
+            LOGGER.info(f"No fids found for obsid {obsid} in kadi starcats")
 
     return fids_commands
 
 
 def get_dwells_with_fids(start, stop):
     """
-    Get telemetry yag, zag values for each fid in ``fids_commands`` at the start
-    of the corresponding ``dwells``.
+    Get a dictionary of kadi OR dwell events with fid lights from start to stop, keyed by obsid.
 
-    :returns: dict of tables keyed by obsid (like commands fids)
+    Parameters
+    ----------
+    start : str
+        The start time of the dwells.
+    stop : str
+        The stop time of the dwells.
+
+    Returns
+    -------
+    dict
+        A dictionary of kadi dwell events keyed by obsid.
+
+    Notes:
+    ------
+    - Only the first science observation dwell with the commanded obsid is included.
+      In the case of scs107 and multiple dwells labeled with the first obsid, only the first
+      can have fid lights turned on anyway.
     """
-    # Only get dwells that have an obsid
+
+    # Limit to the range that has processed obsids
     stop = min(CxoTime(stop).date, events.obsids.all().reverse()[0].stop)
 
-    logger.info("Getting dwells betweeen {} and {}".format(start, stop))
+    LOGGER.info(
+        f"Getting dwells between {CxoTime(start).date} and {CxoTime(stop).date}"
+    )
     dwells = OrderedDict()
     for dwell in events.dwells.filter(start, stop):
         obsid = dwell.get_obsid()
         if obsid > 38000:
             continue
         if obsid in dwells:
-            logger.info("Skipping duplicate obsid {} for dwell {}".format(obsid, dwell))
+            LOGGER.info(f"Skipping duplicate obsid {obsid} for dwell {dwell}")
             continue
         dwells[obsid] = dwell
 
@@ -139,9 +159,9 @@ def get_fids_telem(dwells, fids_commands, dbh):
     fids_telem = {}
 
     for obsid, dwell in dwells.items():
-        logger.debug("Get_fids_telem for obsid {}".format(obsid))
+        LOGGER.debug(f"Get_fids_telem for obsid {obsid}")
         if obsid not in fids_commands:
-            logger.info("Skipping obsid {} not in fids_commands".format(obsid))
+            LOGGER.info(f"Skipping obsid {obsid} not in fids_commands")
             continue
 
         rows = dbh.fetchall(
@@ -154,7 +174,7 @@ def get_fids_telem(dwells, fids_commands, dbh):
                 rows, names=["tstart", "obsid", "slot", "aoacyan", "aoaczan"]
             )
         else:
-            logger.info("No fids found for obsid {}".format(obsid))
+            LOGGER.info(f"No fids found for obsid {obsid}")
 
     return fids_telem
 
@@ -236,12 +256,13 @@ def plot_commands_telem(commands_telem, savefig=None):
     plt.hlines([-35, 35], x0, x1, colors="g", linestyles="--")
     plt.hlines([-40, 40], x0, x1, colors="r", linestyles="--")
     if savefig is not None:
-        logger.info("Writing {}".format(savefig))
+        LOGGER.info(f"Writing {savefig}")
         plt.savefig(savefig)
 
 
 def main(sys_args=None):
     opt = get_opt().parse_args(sys_args)
+
     matplotlib.use("Agg")
 
     start = CxoTime(opt.start) - 90 * u.day if opt.start is None else CxoTime(opt.start)

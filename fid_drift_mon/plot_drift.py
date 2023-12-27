@@ -10,10 +10,14 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import ska_dbi
+from ska_helpers.logging import basic_logger
 
-from .paths import FID_STATS_PATH
+
+from .paths import FID_STATS_PATH, INDEX_TEMPLATE_PATH
 
 EXCLUDE_OBSIDS = "(2010, 2783, 1431, 1411)"
+
+LOGGER = basic_logger(__name__, level="INFO")
 
 
 def get_fid_stats(db, det):
@@ -117,12 +121,19 @@ def parse_args():
     parser.add_argument(
         "--data-dir", type=str, default=".", help="Fid drift data directory"
     )
+    parser.add_argument("--web-dir", type=str, default=".", help="Output web directory")
+    return parser
     args = parser.parse_args()
     return args
 
 
-def main():
-    args = parse_args()
+def main(sys_args=None):
+    args = parse_args().parse_args(sys_args)
+    web_dir = Path(opt.web_dir)
+
+    if not web_dir.exists():
+        LOGGER.info(f"Creating web directory {web_dir}")
+        web_dir.mkdir(parents=True)
 
     matplotlib.use("Agg")
 
@@ -130,16 +141,13 @@ def main():
 
     with ska_dbi.DBI(dbi="sqlite", server=FID_STATS_PATH(args.data_dir)) as dbh:
         for det in dets:
-            # Some filtering here?
             detstats = get_fid_stats(dbh, det)
-            plotfids(detstats, det, args.data_dir)
+            plotfids(detstats, det, web_dir)
 
-    # Copy the index template into the output directory
-    shutil.copyfile(
-        Path(__file__).parent / "data" / "index_template.html",
-        Path(args.data_dir) / "index.html",
-    )
-
+    index_template_html = INDEX_TEMPLATE_PATH().read_text()
+    out_html = web_dir / "index.html"
+    LOGGER.info(f"Writing HTML to {out_html}")
+    out_html.write_text(index_template_html)
 
 if __name__ == "__main__":
     main()
