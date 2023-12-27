@@ -313,6 +313,9 @@ def main(sys_args=None):
     LOGGER.setLevel(opt.log_level)
 
     data_dir = Path(opt.data_dir)
+    if not data_dir.exists():
+        data_dir.mkdir(parents=True)
+
     db3_path = data_dir / "fid_stats.db3"
 
     if not db3_path.exists():
