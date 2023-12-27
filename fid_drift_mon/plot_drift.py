@@ -121,16 +121,12 @@ def parse_args():
     parser.add_argument(
         "--data-dir", type=str, default=".", help="Fid drift data directory"
     )
-    parser.add_argument(
-        "--web-dir", type=str, default=".", help="Output web directory"
-    )
+    parser.add_argument("--web-dir", type=str, default=".", help="Output web directory")
     return parser
-    args = parser.parse_args()
-    return args
 
 
 def main(sys_args=None):
-    args = parse_args().parse_args(sys_args)
+    opt = parse_args().parse_args(sys_args)
     web_dir = Path(opt.web_dir)
 
     if not web_dir.exists():
@@ -141,7 +137,7 @@ def main(sys_args=None):
 
     dets = ("ACIS-S", "ACIS-I", "HRC-S", "HRC-I")
 
-    with ska_dbi.DBI(dbi="sqlite", server=FID_STATS_PATH(args.data_dir)) as dbh:
+    with ska_dbi.DBI(dbi="sqlite", server=FID_STATS_PATH(opt.data_dir)) as dbh:
         for det in dets:
             detstats = get_fid_stats(dbh, det)
             plotfids(detstats, det, web_dir)
@@ -150,6 +146,7 @@ def main(sys_args=None):
     out_html = web_dir / "index.html"
     LOGGER.info(f"Writing HTML to {out_html}")
     out_html.write_text(index_template_html)
+
 
 if __name__ == "__main__":
     main()
