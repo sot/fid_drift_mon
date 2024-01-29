@@ -61,7 +61,7 @@ FORMAT_ROUND = dict(
     exp_time=2,
     sim_z_offset=1,
     tstart=1,
-    tstop=1
+    tstop=1,
 )
 
 
@@ -160,8 +160,8 @@ def get_archive_file_data(obs, content, max_files=None):
     LOGGER.debug(f"Got {len(dats)} {content} files")
     if content == "FIDPROPS":
         for dat, file in zip(dats, files):
-            dat['tstart'] = dat.meta['TSTART']
-            dat['tstop'] = dat.meta['TSTOP']
+            dat["tstart"] = dat.meta["TSTART"]
+            dat["tstop"] = dat.meta["TSTOP"]
 
     if len(dats) == 1:
         out = dats[0]
@@ -212,7 +212,6 @@ def calc_fid_stats(obs, fidprops, acen):
     """
     stats = []
     for fidpr in fidprops:
-
         if fidpr["id_status"].strip() != "GOOD":
             LOGGER.info(
                 f"WARNING: obsid {obs['obsid']} has bad fid status "
@@ -221,8 +220,9 @@ def calc_fid_stats(obs, fidprops, acen):
             continue
         if (fidpr["tstop"] - fidpr["tstart"]) < 60:
             LOGGER.info(
-                f"WARNING: Skipping short aspect interval "
-                f"{fidpr['tstop'] - fidpr['tstart']} in obsid {obs['obsid']} slot {fidpr['slot']}"
+                "WARNING: Skipping short aspect interval"
+                f" {fidpr['tstop'] - fidpr['tstart']} in obsid {obs['obsid']} slot"
+                f" {fidpr['slot']}"
             )
             continue
         # Limit the acen data to just cover the fidprops interval
@@ -274,8 +274,8 @@ def calc_stats_for_fidpr(obs, acen, fidpr):
         "slot": slot,
         "id_num": fidpr["id_num"],
         "id_string": fidpr["id_string"].strip(),
-        "tstart": fidpr['tstart'],
-        'tstop': fidpr['tstop'],
+        "tstart": fidpr["tstart"],
+        "tstop": fidpr["tstop"],
         "obsid": obs["obsid"],
         "date_obs": obs["obs_start"],
         "ang_y_med": np.median(ang_y_sm[-1000:]),

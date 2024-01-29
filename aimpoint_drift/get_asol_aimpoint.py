@@ -15,7 +15,7 @@ from Ska.DBI import DBI
 
 def get_opt():
     parser = argparse.ArgumentParser(
-        description="Get aimpoint drift data " "from aspect solution files"
+        description="Get aimpoint drift data from aspect solution files"
     )
     parser.add_argument(
         "--data-root", default=".", help="Root directory for asol and index files"
@@ -80,8 +80,9 @@ obsid_file = os.path.join(opt.data_root, "aimpoint_obsid_index.shelve")
 # Get obsids in date range
 db = DBI(dbi="sqlite", server="/data/aca/archive/obspar/archfiles.db3")
 obs = db.fetchall(
-    "select obsid, tstart from archfiles where tstart > {}"
-    " and tstart < {}".format(start.secs, stop.secs)
+    "select obsid, tstart from archfiles where tstart > {} and tstart < {}".format(
+        start.secs, stop.secs
+    )
 )
 db.conn.close()
 

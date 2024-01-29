@@ -14,7 +14,20 @@ from ska_helpers.logging import basic_logger
 
 from .paths import FID_STATS_PATH, INDEX_TEMPLATE_PATH
 
-EXCLUDE_OBSIDS = [2010, 2783, 1431, 1411, 11051, 2733, 2194, 3472, 7587, 16630, 3582, 3988]
+EXCLUDE_OBSIDS = [
+    2010,
+    2783,
+    1431,
+    1411,
+    11051,
+    2733,
+    2194,
+    3472,
+    7587,
+    16630,
+    3582,
+    3988,
+]
 
 LOGGER = basic_logger(__name__, level="INFO")
 

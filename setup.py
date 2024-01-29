@@ -5,7 +5,10 @@ entry_points = {
     "console_scripts": [
         "fid_drift_mon_update_fid_stats = fid_drift_mon.update_fid_stats:main",
         "fid_drift_mon_plot_drift = fid_drift_mon.plot_drift:main",
-        "fid_drift_mon_plot_command_vs_telem = fid_drift_mon.plot_command_vs_telem:main",
+        (
+            "fid_drift_mon_plot_command_vs_telem ="
+            " fid_drift_mon.plot_command_vs_telem:main"
+        ),
     ]
 }
 
