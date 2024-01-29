@@ -28,6 +28,7 @@ create table fid_stats (
     id_num int,
     id_string varchar(10),
     tstart float,
+    tstop float,
     date_obs varchar(21),
     ang_y_med float,
     ang_z_med float,
@@ -60,6 +61,7 @@ FORMAT_ROUND = dict(
     exp_time=2,
     sim_z_offset=1,
     tstart=1,
+    tstop=1
 )
 
 
@@ -92,8 +94,7 @@ def process_obs(dbh, obs):
     LOGGER.info(f"***** PROCESSING OBSID {obsid} at {obs['obs_start']} *****")
 
     # Read FIDPROPS and ACACENT data tables. This vstacks the files as needed.
-    # If anything went wrong an error message is logged and we carry on.
-    fidprops = get_archive_file_data(obs, "FIDPROPS", max_files=1)
+    fidprops = get_archive_file_data(obs, "FIDPROPS")
     if fidprops is None:
         return
     acen = get_archive_file_data(obs, "ACACENT")
@@ -151,6 +152,11 @@ def get_archive_file_data(obs, content, max_files=None):
 
     dats = [Table.read(file) for file in files]
     LOGGER.debug(f"Got {len(dats)} {content} files")
+    if content == "FIDPROPS":
+        for dat, file in zip(dats, files):
+            dat['tstart'] = dat.meta['TSTART']
+            dat['tstop'] = dat.meta['TSTOP']
+
     if len(dats) == 1:
         out = dats[0]
     else:
@@ -200,13 +206,22 @@ def calc_fid_stats(obs, fidprops, acen):
     """
     stats = []
     for fidpr in fidprops:
+
         if fidpr["id_status"].strip() != "GOOD":
             LOGGER.info(
                 f"WARNING: obsid {obs['obsid']} has bad fid status "
                 f"{fidpr['id_status']!r} in slot {fidpr['slot']}"
             )
             continue
-        stat = calc_stats_for_fidpr(obs, acen, fidpr)
+        if (fidpr["tstop"] - fidpr["tstart"]) < 60:
+            LOGGER.info(
+                f"Skipping short aspect interval "
+                f"{fidpr['tstop'] - fidpr['tstart']} in slot {fidpr['slot']}"
+            )
+            continue
+        # Limit the acen data to just cover the fidprops interval
+        ok = (acen["time"] >= fidpr["tstart"]) & (acen["time"] <= fidpr["tstop"])
+        stat = calc_stats_for_fidpr(obs, acen[ok], fidpr)
         if stat is not None:
             stats.append(stat)
 
@@ -252,8 +267,9 @@ def calc_stats_for_fidpr(obs, acen, fidpr):
     stat = {
         "slot": slot,
         "id_num": fidpr["id_num"],
-        "id_string": fidpr["id_string"],
-        "tstart": CxoTime(obs["obs_start"]).secs,
+        "id_string": fidpr["id_string"].strip(),
+        "tstart": fidpr['tstart'],
+        'tstop': fidpr['tstop'],
         "obsid": obs["obsid"],
         "date_obs": obs["obs_start"],
         "ang_y_med": np.median(ang_y_sm[-1000:]),
