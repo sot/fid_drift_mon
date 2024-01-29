@@ -124,8 +124,9 @@ def main(args=None):
     dr99 = np.percentile(dr, 99.0)
     print()
     print(
-        "99th percentile radius for fid light offset from median is {:.1f} arcsec"
-        .format(dr99)
+        "99th percentile radius for fid light offset from median is {:.1f} arcsec".format(
+            dr99
+        )
     )
 
 
