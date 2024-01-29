@@ -93,6 +93,12 @@ def process_obs(dbh, obs):
 
     LOGGER.info(f"***** PROCESSING OBSID {obsid} at {obs['obs_start']} *****")
 
+    # Check if this is multi-obi and skip if so
+    obss = get_observations(obsid=obsid)
+    if len(obss) > 1:
+        LOGGER.info(f"Obsid {obsid} has multiple observations, skipping")
+        return
+
     # Read FIDPROPS and ACACENT data tables. This vstacks the files as needed.
     fidprops = get_archive_file_data(obs, "FIDPROPS")
     if fidprops is None:
