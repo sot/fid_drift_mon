@@ -14,7 +14,7 @@ from ska_helpers.logging import basic_logger
 
 from .paths import FID_STATS_PATH, INDEX_TEMPLATE_PATH
 
-EXCLUDE_OBSIDS = "(2010, 2783, 1431, 1411)"
+EXCLUDE_OBSIDS = [2010, 2783, 1431, 1411, 11051, 2733, 2194, 3472, 7587, 16630, 3582, 3988]
 
 LOGGER = basic_logger(__name__, level="INFO")
 
@@ -23,8 +23,8 @@ def get_fid_stats(db, det):
     query = (
         "select obsid, id_num, id_string, tstart, ang_y_med, ang_z_med, sim_z_offset"
         " FROM fid_stats"
-        ' WHERE id_string LIKE "{}%" '
-        " and obsid not in {} ".format(det, EXCLUDE_OBSIDS)
+        f' WHERE id_string LIKE "{det}%" '
+        f" and obsid not in ({','.join([str(obsid) for obsid in EXCLUDE_OBSIDS])}) "
     )
     vals = db.fetchall(query)
     return vals
