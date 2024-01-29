@@ -96,7 +96,7 @@ def process_obs(dbh, obs):
     # Check if this is multi-obi and skip if so
     obss = get_observations(obsid=obsid)
     if len(obss) > 1:
-        LOGGER.info(f"Obsid {obsid} has multiple observations, skipping")
+        LOGGER.info(f"WARNING: Obsid {obsid} has multiple observations, skipping")
         return
 
     # Read FIDPROPS and ACACENT data tables. This vstacks the files as needed.
@@ -221,8 +221,8 @@ def calc_fid_stats(obs, fidprops, acen):
             continue
         if (fidpr["tstop"] - fidpr["tstart"]) < 60:
             LOGGER.info(
-                f"Skipping short aspect interval "
-                f"{fidpr['tstop'] - fidpr['tstart']} in slot {fidpr['slot']}"
+                f"WARNING: Skipping short aspect interval "
+                f"{fidpr['tstop'] - fidpr['tstart']} in obsid {obs['obsid']} slot {fidpr['slot']}"
             )
             continue
         # Limit the acen data to just cover the fidprops interval
