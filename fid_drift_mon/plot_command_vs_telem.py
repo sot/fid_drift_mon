@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
 Plot positions of fid lights from commands and the actual values seen in telemetry.
+
 ::
 
   Usage: plot_commands_vs_telem.py [-h] [--start START] [--stop STOP]
@@ -28,8 +29,8 @@ from astropy.table import Table
 from cxotime import CxoTime
 from kadi import events
 from kadi.commands import observations
-from ska_matplotlib import plot_cxctime
 from ska_helpers.logging import basic_logger
+from ska_matplotlib import plot_cxctime
 
 from .paths import FID_STATS_PATH
 
@@ -68,7 +69,7 @@ def get_fids_commands(dwells):
     LOGGER.info("Getting fids from commands")
     fids_commands = {}
 
-    for obsid, dwell in dwells.items():
+    for obsid in dwells:
         # Only accept the first dwell of science observations
         if obsid in fids_commands:
             LOGGER.info(f"Skipping obsid {obsid} already in fids_commands")
@@ -139,6 +140,8 @@ def get_dwells_with_fids(start, stop):
 
 def get_fids_telem(dwells, fids_commands, dbh):
     """
+    Retrieve fid positions.
+
     Retrieve the fid position yag, zag values from the fid stats database for each commanded
     fid in ``fids_commands`` at the start of the corresponding dwell in ``dwells``.
 
@@ -159,7 +162,7 @@ def get_fids_telem(dwells, fids_commands, dbh):
     """
     fids_telem = {}
 
-    for obsid, dwell in dwells.items():
+    for obsid in dwells:
         LOGGER.debug(f"Get_fids_telem for obsid {obsid}")
         if obsid not in fids_commands:
             LOGGER.info(f"Skipping obsid {obsid} not in fids_commands")

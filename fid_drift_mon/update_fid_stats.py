@@ -3,9 +3,9 @@
 Gather fid statistics and store in the fid_stats table in a sqlite3 database.
 """
 
+import argparse
 from pathlib import Path
 
-import argparse
 import astropy.units as u
 import numpy as np
 import ska_dbi
@@ -47,22 +47,22 @@ create index fid_stats_obsid_index on fid_stats ( obsid ) ;
 """
 
 # Define reasonable precision for fid stats numerical values
-FORMAT_ROUND = dict(
-    ang_y_med=2,
-    ang_z_med=2,
-    ang_y_start_med=2,
-    ang_z_start_med=2,
-    ang_y_95th=2,
-    ang_z_95th=2,
-    ang_y_5th=2,
-    ang_z_5th=2,
-    mag_med=3,
-    mag_i_avg=3,
-    exp_time=2,
-    sim_z_offset=1,
-    tstart=1,
-    tstop=1,
-)
+FORMAT_ROUND = {
+    "ang_y_med": 2,
+    "ang_z_med": 2,
+    "ang_y_start_med": 2,
+    "ang_z_start_med": 2,
+    "ang_y_95th": 2,
+    "ang_z_95th": 2,
+    "ang_y_5th": 2,
+    "ang_z_5th": 2,
+    "mag_med": 3,
+    "mag_i_avg": 3,
+    "exp_time": 2,
+    "sim_z_offset": 1,
+    "tstart": 1,
+    "tstop": 1,
+}
 
 
 def process_obs(dbh, obs):
@@ -159,7 +159,7 @@ def get_archive_file_data(obs, content, max_files=None):
     dats = [Table.read(file) for file in files]
     LOGGER.debug(f"Got {len(dats)} {content} files")
     if content == "FIDPROPS":
-        for dat, file in zip(dats, files):
+        for dat in dats:
             dat["tstart"] = dat.meta["TSTART"]
             dat["tstop"] = dat.meta["TSTOP"]
 
@@ -299,7 +299,7 @@ def calc_stats_for_fidpr(obs, acen, fidpr):
     return stat
 
 
-def get_options(sys_args=None):
+def get_options():
     parser = argparse.ArgumentParser(description=f"get_fid_data {__version__}")
     parser.add_argument(
         "--data-dir", type=str, default=".", help="Data directory (default='.')"

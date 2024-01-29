@@ -11,7 +11,6 @@ import numpy as np
 import ska_dbi
 from ska_helpers.logging import basic_logger
 
-
 from .paths import FID_STATS_PATH, INDEX_TEMPLATE_PATH
 
 EXCLUDE_OBSIDS = [
