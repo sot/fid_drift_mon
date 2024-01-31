@@ -26,7 +26,7 @@ EXCLUDE_OBSIDS = [
     16630,
     3582,
     3988,
-    16314
+    16314,
 ]
 
 LOGGER = basic_logger(__name__, level="INFO")
