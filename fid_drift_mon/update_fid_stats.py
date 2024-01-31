@@ -288,7 +288,7 @@ def calc_stats_for_fidpr(obs, acen, fidpr):
         "ang_z_95th": np.percentile(ang_z_sm, 95),
         "mag_med": count_rate_to_mag(np.median(cen["counts"]) / t_int),
         "mag_i_avg": fidpr["mag_i_avg"],
-        "exp_time": np.max(acen['time'][ok]) - np.min(acen['time'][ok]),
+        "exp_time": np.max(acen["time"][ok]) - np.min(acen["time"][ok]),
         "sim_z_offset": sim_z_offset,
     }
 
