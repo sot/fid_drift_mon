@@ -96,7 +96,7 @@ def process_obs(dbh, obs):
     # Check if this is multi-obi and skip if so
     obss = get_observations(obsid=obsid)
     if len(obss) > 1:
-        LOGGER.info(f"WARNING: Obsid {obsid} has multiple observations, skipping")
+        LOGGER.info(f"Obsid {obsid} has multiple observations, skipping")
         return
 
     # Read FIDPROPS and ACACENT data tables. This vstacks the files as needed.
