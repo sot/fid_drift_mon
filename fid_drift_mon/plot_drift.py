@@ -53,6 +53,7 @@ def plotfids(detstats, det, data_dir):
     }
     fidcolor = " bgrcmkbgrcbgrc"
     sim_z_nom = np.median(detstats["sim_z_offset"])  # median for this detector
+    plt.close(1)
     plt.figure(1, figsize=(6, 4.5))
     plt.clf()
     plt.subplot(2, 1, 1)
